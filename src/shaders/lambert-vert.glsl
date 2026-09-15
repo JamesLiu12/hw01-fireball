@@ -30,6 +30,8 @@ in vec4 vs_Col;             // The array of vertex colors passed to the shader.
 out vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
+out vec3 fs_Pos;
+out float fs_Height;
 
 const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
                                         //the geometry in the fragment shader.
@@ -121,12 +123,24 @@ void main()
                                                             // Transform the geometry's normals by the inverse transpose of the
                                                             // model matrix. This is necessary to ensure the normals remain
                                                             // perpendicular to the surface after the surface is transformed by
-                                                            // the model matrix.
-
-    float height = largeShape(vs_Pos.xyz) + fineShape(vs_Pos.xyz);
+                                                            // the model matrix.    
+    
+    vec3 tailDirection = normalize(vec3(1.0, 1.0, 0.0));
+    
+    float along = dot(normalize(vs_Pos.xyz), tailDirection);
+    float waveStrength = mix(0.3, 1.5, smoothstep(-1.0, 1.0, along));
+    float height = (largeShape(vs_Pos.xyz) + fineShape(vs_Pos.xyz)) * waveStrength;
+    
+    fs_Pos = vs_Pos.xyz;
+    fs_Height = height;
 
     vec3 normal = normalize(vs_Nor.xyz);
     vec3 displacedPos = vs_Pos.xyz + height * normal;
+    
+    float tail = smoothstep(0.0, 1.0, along);
+    float flicker = 0.1 * sin(2.0 * u_Time + 10.0 * vs_Pos.z);
+    displacedPos += tailDirection * tail * tail * (1.0 + flicker);
+    displacedPos -= tailDirection * 0.5;
 
     vec4 modelposition = u_Model * vec4(displacedPos, 1.0);   // Temporarily store the transformed vertex positions for use below
 

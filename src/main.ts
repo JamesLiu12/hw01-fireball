@@ -15,7 +15,7 @@ import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   tesselations: 5,
-  speed: 1.0,
+  speed: 5.0,
   'Load Scene': loadScene, // A function pointer, essentially
 };
 
