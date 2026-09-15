@@ -10,6 +10,8 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 
 import lambertVertSource from './shaders/lambert-vert.glsl?raw';
 import lambertFragSource from './shaders/lambert-frag.glsl?raw';
+import skyVertSource from './shaders/sky-vert.glsl?raw';
+import skyFragSource from './shaders/sky-frag.glsl?raw';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -22,6 +24,9 @@ const controls = {
   coolColor: [255, 14, 0],
   middleColor: [255, 77, 0],
   hotColor: [255, 247, 31],
+  skyBottomColor: [6, 6, 35],
+  skyTopColor: [0, 0, 0],
+  starDensity: 0.25,
   'Reset Defaults': resetDefaults,
   'Load Scene': loadScene, // A function pointer, essentially
 };
@@ -46,6 +51,9 @@ function resetDefaults() {
   controls.coolColor = [255, 14, 0];
   controls.middleColor = [255, 77, 0];
   controls.hotColor = [255, 247, 31];
+  controls.skyBottomColor = [6, 6, 35];
+  controls.skyTopColor = [0, 0, 0];
+  controls.starDensity = 0.25;
 }
 
 function main() {
@@ -67,6 +75,9 @@ function main() {
   gui.addColor(controls, 'coolColor');
   gui.addColor(controls, 'middleColor');
   gui.addColor(controls, 'hotColor');
+  gui.addColor(controls, 'skyBottomColor').listen();
+  gui.addColor(controls, 'skyTopColor').listen();
+  gui.add(controls, 'starDensity', 0, 1).step(0.01).listen();
   gui.add(controls, 'Reset Defaults');
   gui.add(controls, 'Load Scene');
 
@@ -94,6 +105,11 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, lambertFragSource),
   ]);
 
+  const sky = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, skyVertSource),
+    new Shader(gl.FRAGMENT_SHADER, skyFragSource),
+  ]);
+
   let totalTime = 0;
   let pervTime = performance.now();
   // This function will be called every frame
@@ -105,6 +121,15 @@ function main() {
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
+    gl.disable(gl.DEPTH_TEST);
+    gl.depthMask(false);
+    sky.setTime(totalTime);
+    sky.setSkyBottomColor(controls.skyBottomColor);
+    sky.setSkyTopColor(controls.skyTopColor);
+    sky.setStarDensity(controls.starDensity);
+    sky.draw(square);
+    gl.depthMask(true);
+    gl.enable(gl.DEPTH_TEST);
     if(controls.tesselations != prevTesselations)
     {
       prevTesselations = controls.tesselations;

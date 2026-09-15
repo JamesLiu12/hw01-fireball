@@ -37,6 +37,9 @@ class ShaderProgram {
   unifCoolColor: WebGLUniformLocation;
   unifMiddleColor: WebGLUniformLocation;
   unifHotColor: WebGLUniformLocation;
+  unifSkyBottomColor: WebGLUniformLocation;
+  unifSkyTopColor: WebGLUniformLocation;
+  unifStarDensity: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -63,6 +66,9 @@ class ShaderProgram {
     this.unifCoolColor = gl.getUniformLocation(this.prog, "u_CoolColor");
     this.unifMiddleColor = gl.getUniformLocation(this.prog, "u_MiddleColor");
     this.unifHotColor = gl.getUniformLocation(this.prog, "u_HotColor");
+    this.unifSkyBottomColor = gl.getUniformLocation(this.prog, "u_SkyBottomColor");
+    this.unifSkyTopColor = gl.getUniformLocation(this.prog, "u_SkyTopColor");
+    this.unifStarDensity = gl.getUniformLocation(this.prog, "u_StarDensity");
   }
 
   use() {
@@ -146,6 +152,27 @@ class ShaderProgram {
     this.use();
     if (this.unifHotColor !== -1) {
       gl.uniform3f(this.unifHotColor, hotColor[0] / 255, hotColor[1] / 255, hotColor[2] / 255);
+    }
+  }
+
+  setSkyBottomColor(skyBottomColor: number[]) {
+    this.use();
+    if (this.unifSkyBottomColor !== -1) {
+      gl.uniform3f(this.unifSkyBottomColor, skyBottomColor[0] / 255, skyBottomColor[1] / 255, skyBottomColor[2] / 255);
+    }
+  }
+
+  setSkyTopColor(skyTopColor: number[]) {
+    this.use();
+    if (this.unifSkyTopColor !== -1) {
+      gl.uniform3f(this.unifSkyTopColor, skyTopColor[0] / 255, skyTopColor[1] / 255, skyTopColor[2] / 255);
+    }
+  }
+
+  setStarDensity(starDensity: number) {
+    this.use();
+    if (this.unifStarDensity !== -1) {
+      gl.uniform1f(this.unifStarDensity, starDensity);
     }
   }
 
