@@ -15,6 +15,7 @@ import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   tesselations: 5,
+  speed: 1.0,
   'Load Scene': loadScene, // A function pointer, essentially
 };
 
@@ -41,6 +42,7 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
+  gui.add(controls, 'speed', 0, 10).step(0.1);
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -67,8 +69,13 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, lambertFragSource),
   ]);
 
+  let totalTime = 0;
+  let pervTime = performance.now();
   // This function will be called every frame
   function tick() {
+    const now = performance.now();
+    totalTime += Math.min((now - pervTime) / 1000, 0.1) * controls.speed;
+    pervTime = now;
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -79,6 +86,7 @@ function main() {
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
     }
+    lambert.setTime(totalTime);
     renderer.render(camera, lambert, [
       icosphere,
       // square,
