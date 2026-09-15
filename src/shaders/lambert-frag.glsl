@@ -12,6 +12,9 @@
 precision highp float;
 
 uniform float u_Time;
+uniform vec3 u_CoolColor;
+uniform vec3 u_MiddleColor;
+uniform vec3 u_HotColor;
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 
 // These are the interpolated values out of the rasterizer, so you can't know
@@ -75,9 +78,9 @@ void main()
 
     float heat = 0.56 - 0.43 * along + 0.65 * (patches - 0.5) - 0.35 * fs_Height;
     vec3 color = 
-        heat < 0.4 ? vec3(1.0, 0.055, 0.0) : 
-        heat < 0.6 ? vec3(1.0, 0.30, 0.0) : 
-        heat < 0.8 ? vec3(1.0, 0.65, 0.0) : vec3(1.0, 0.97, 0.12);
+        heat < 0.4 ? u_CoolColor : 
+        heat < 0.6 ? u_MiddleColor : 
+        heat < 0.8 ? mix(u_MiddleColor, u_HotColor, 0.5) : u_HotColor;
     float hotSpot = smoothstep(0.7, 0.8, patches) * (1.0 - tail);
     color = mix(color, vec3(1.0, 1.0, 0.82), hotSpot);
 

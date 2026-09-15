@@ -20,6 +20,9 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform float u_Time;
+uniform int u_Octaves;
+uniform float u_WaveStrength;
+uniform float u_TailLength;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -90,7 +93,7 @@ float fbm(vec3 p)
     float amplitude = 1.0;
     float frequency = 1.0;
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < u_Octaves; i++)
     {
         result += amplitude * noise3D(p * frequency);
         amplitude *= persistence;
@@ -129,7 +132,7 @@ void main()
     
     float along = dot(normalize(vs_Pos.xyz), tailDirection);
     float waveStrength = mix(0.3, 1.5, smoothstep(-1.0, 1.0, along));
-    float height = (largeShape(vs_Pos.xyz) + fineShape(vs_Pos.xyz)) * waveStrength;
+    float height = (largeShape(vs_Pos.xyz) + fineShape(vs_Pos.xyz)) * waveStrength * u_WaveStrength;
     
     fs_Pos = vs_Pos.xyz;
     fs_Height = height;
@@ -139,7 +142,7 @@ void main()
     
     float tail = smoothstep(0.0, 1.0, along);
     float flicker = 0.1 * sin(2.0 * u_Time + 10.0 * vs_Pos.z);
-    displacedPos += tailDirection * tail * tail * (1.0 + flicker);
+    displacedPos += tailDirection * tail * tail * u_TailLength * (1.0 + flicker);
     displacedPos -= tailDirection * 0.5;
 
     vec4 modelposition = u_Model * vec4(displacedPos, 1.0);   // Temporarily store the transformed vertex positions for use below

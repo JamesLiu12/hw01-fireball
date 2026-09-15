@@ -16,6 +16,13 @@ import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 const controls = {
   tesselations: 5,
   speed: 5.0,
+  octaves: 6,
+  waveStrength: 1.0,
+  tailLength: 1.0,
+  coolColor: [255, 14, 0],
+  middleColor: [255, 77, 0],
+  hotColor: [255, 247, 31],
+  'Reset Defaults': resetDefaults,
   'Load Scene': loadScene, // A function pointer, essentially
 };
 
@@ -28,6 +35,17 @@ function loadScene() {
   icosphere.create();
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
+}
+
+function resetDefaults() {
+  controls.tesselations = 5;
+  controls.speed = 5.0;
+  controls.octaves = 6;
+  controls.waveStrength = 1.0;
+  controls.tailLength = 1.0;
+  controls.coolColor = [255, 14, 0];
+  controls.middleColor = [255, 77, 0];
+  controls.hotColor = [255, 247, 31];
 }
 
 function main() {
@@ -43,6 +61,13 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'speed', 0, 10).step(0.1);
+  gui.add(controls, 'octaves', 1, 10).step(1);
+  gui.add(controls, 'waveStrength', 0, 2).step(0.1);
+  gui.add(controls, 'tailLength', 0, 2).step(0.1);
+  gui.addColor(controls, 'coolColor');
+  gui.addColor(controls, 'middleColor');
+  gui.addColor(controls, 'hotColor');
+  gui.add(controls, 'Reset Defaults');
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -87,6 +112,12 @@ function main() {
       icosphere.create();
     }
     lambert.setTime(totalTime);
+    lambert.setOctaves(controls.octaves);
+    lambert.setWaveStrength(controls.waveStrength);
+    lambert.setTailLength(controls.tailLength);
+    lambert.setCoolColor(controls.coolColor);
+    lambert.setMiddleColor(controls.middleColor);
+    lambert.setHotColor(controls.hotColor);
     renderer.render(camera, lambert, [
       icosphere,
       // square,

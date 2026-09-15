@@ -31,6 +31,12 @@ class ShaderProgram {
   unifColor: WebGLUniformLocation;
   unifTime: WebGLUniformLocation;
   unifSpeed: WebGLUniformLocation;
+  unifOctaves: WebGLUniformLocation;
+  unifWaveStrength: WebGLUniformLocation;
+  unifTailLength: WebGLUniformLocation;
+  unifCoolColor: WebGLUniformLocation;
+  unifMiddleColor: WebGLUniformLocation;
+  unifHotColor: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -51,6 +57,12 @@ class ShaderProgram {
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
+    this.unifOctaves    = gl.getUniformLocation(this.prog, "u_Octaves");
+    this.unifWaveStrength = gl.getUniformLocation(this.prog, "u_WaveStrength");
+    this.unifTailLength = gl.getUniformLocation(this.prog, "u_TailLength");
+    this.unifCoolColor = gl.getUniformLocation(this.prog, "u_CoolColor");
+    this.unifMiddleColor = gl.getUniformLocation(this.prog, "u_MiddleColor");
+    this.unifHotColor = gl.getUniformLocation(this.prog, "u_HotColor");
   }
 
   use() {
@@ -92,6 +104,48 @@ class ShaderProgram {
     this.use();
     if (this.unifTime !== -1) {
       gl.uniform1f(this.unifTime, time);
+    }
+  }
+
+  setOctaves(octaves: number) {
+    this.use();
+    if (this.unifOctaves !== -1) {
+      gl.uniform1i(this.unifOctaves, octaves);
+    }
+  }
+
+  setWaveStrength(waveStrength: number) {
+    this.use();
+    if (this.unifWaveStrength !== -1) {
+      gl.uniform1f(this.unifWaveStrength, waveStrength);
+    }
+  }
+
+  setTailLength(tailLength: number) {
+    this.use();
+    if (this.unifTailLength !== -1) {
+      gl.uniform1f(this.unifTailLength, tailLength);
+    }
+  }
+
+  setCoolColor(coolColor: number[]) {
+    this.use();
+    if (this.unifCoolColor !== -1) {
+      gl.uniform3f(this.unifCoolColor, coolColor[0] / 255, coolColor[1] / 255, coolColor[2] / 255);
+    }
+  }
+
+  setMiddleColor(middleColor: number[]) {
+    this.use();
+    if (this.unifMiddleColor !== -1) {
+      gl.uniform3f(this.unifMiddleColor, middleColor[0] / 255, middleColor[1] / 255, middleColor[2] / 255);
+    }
+  }
+
+  setHotColor(hotColor: number[]) {
+    this.use();
+    if (this.unifHotColor !== -1) {
+      gl.uniform3f(this.unifHotColor, hotColor[0] / 255, hotColor[1] / 255, hotColor[2] / 255);
     }
   }
 
